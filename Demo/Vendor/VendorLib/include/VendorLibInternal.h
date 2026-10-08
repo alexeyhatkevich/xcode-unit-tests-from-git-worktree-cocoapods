@@ -1,0 +1,1 @@
+#define VENDOR_LIB_VERSION 3

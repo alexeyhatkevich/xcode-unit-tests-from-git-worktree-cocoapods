@@ -1,0 +1,60 @@
+name: Demo
+options:
+  bundleIdPrefix: com.alexeyhatkevich
+  deploymentTarget:
+    iOS: "17.0"
+settings:
+  base:
+    # The trap: a project-level define that every target inherits unless it
+    # overrides the key. (Think: a project that once migrated from SwiftPM.)
+    GCC_PREPROCESSOR_DEFINITIONS: "SWIFT_PACKAGE=1"
+    HEADER_SEARCH_PATHS: "$(SRCROOT)/Vendor/VendorLib/include"
+    SWIFT_VERSION: "5.0"
+    CODE_SIGNING_ALLOWED: NO
+targets:
+  Demo:
+    type: application
+    platform: iOS
+    sources: [Sources, Vendor]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.alexeyhatkevich.xcodeunittestsfromgitworktreecocoapods
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        # The app overrides the key with its own list -> never sees SWIFT_PACKAGE.
+        GCC_PREPROCESSOR_DEFINITIONS: "APP=1"
+  NaiveTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Tests]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.alexeyhatkevich.xcodeunittestsfromgitworktreecocoapods.naivetests
+        GENERATE_INFOPLIST_FILE: YES
+        # Nothing else here: GCC_PREPROCESSOR_DEFINITIONS is inherited -> SWIFT_PACKAGE=1.
+  FixedTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Tests]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.alexeyhatkevich.xcodeunittestsfromgitworktreecocoapods.fixedtests
+        GENERATE_INFOPLIST_FILE: YES
+        # The fix: set the key explicitly on the test target, without $(inherited).
+        GCC_PREPROCESSOR_DEFINITIONS: "TESTS=1"
+schemes:
+  Demo:
+    build:
+      targets: { Demo: all }
+    test:
+      targets: [FixedTests]
+  NaiveTests:
+    build:
+      targets: { NaiveTests: all }
+    test:
+      targets: [NaiveTests]
+  FixedTests:
+    build:
+      targets: { FixedTests: all }
+    test:
+      targets: [FixedTests]
